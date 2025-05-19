@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>3D Animated Calculator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+      background: #000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Orbitron', sans-serif;
+      perspective: 1000px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Galaxy Background */
+    .galaxy-background {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: radial-gradient(ellipse at center, rgba(33, 5, 65, 1) 0%, rgba(13, 2, 26, 1) 50%, rgba(0, 0, 0, 1) 100%);
+      overflow: hidden;
+    }
+
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    .nebula {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxmaWx0ZXIgaWQ9Im5vaXNlIj4KICAgIDxmZVR1cmJ1bGVuY2UgdHlwZT0iZnJhY3RhbE5vaXNlIiBiYXNlRnJlcXVlbmN5PSIwLjAxIiBudW1PY3RhdmVzPSI0IiBzdGl0Y2hUaWxlcz0ic3RpdGNoIiByZXN1bHQ9Im5vaXNlIj48L2ZlVHVyYnVsZW5jZT4KICAgIDxmZUNvbG9yTWF0cml4IHR5cGU9Im1hdHJpeCIgdmFsdWVzPSIwIDAgMCAwIDAgIDAgMCAwIDAgMCAgMCAwIDAgMCAwICAwIDAgMCAwLjUgMCIgcmVzdWx0PSJjb2xvcmVkTm9pc2UiPjwvZmVDb2xvck1hdHJpeD4KICAgIDxmZUJsZW5kIGluPSJTb3VyY2VHcmFwaGljIiBpbjI9ImNvbG9yZWROb2lzZSIgbW9kZT0ib3ZlcmxheSIgcmVzdWx0PSJibGVuZCI+PC9mZUJsZW5kPgogIDwvZmlsdGVyPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbHRlcj0idXJsKCNub2lzZSkiIG9wYWNpdHk9IjAuMiI+PC9yZWN0Pgo8L3N2Zz4=');
+      opacity: 0.3;
+      z-index: 2;
+      animation: nebula-move 120s linear infinite;
+    }
+
+    .galaxy {
+      position: absolute;
+      width: 200%;
+      height: 200%;
+      top: -50%;
+      left: -50%;
+      background: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogIDxkZWZzPgogICAgPHJhZGlhbEdyYWRpZW50IGlkPSJnYWxheHkiIGN4PSI1MCUiIGN5PSI1MCUiIHI9IjUwJSIgZng9IjUwJSIgZnk9IjUwJSI+CiAgICAgIDxzdG9wIG9mZnNldD0iMCUiIHN0b3AtY29sb3I9InJnYmEoMTI4LCA4MCwgMjU1LCAwLjIpIj48L3N0b3A+CiAgICAgIDxzdG9wIG9mZnNldD0iMjUlIiBzdG9wLWNvbG9yPSJyZ2JhKDY0LCAxMjgsIDI1NSwgMC4xNSkiPjwvc3RvcD4KICAgICAgPHN0b3Agb2Zmc2V0PSI1MCUiIHN0b3AtY29sb3I9InJnYmEoMCwgMjU1LCAyNTUsIDAuMSkiPjwvc3RvcD4KICAgICAgPHN0b3Agb2Zmc2V0PSI3NSUiIHN0b3AtY29sb3I9InJnYmEoMjU1LCA2NCwgMjU1LCAwLjA1KSI+PC9zdG9wPgogICAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9InJnYmEoMCwgMCwgMCwgMCkiPjwvc3RvcD4KICAgIDwvcmFkaWFsR3JhZGllbnQ+CiAgPC9kZWZzPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ2FsYXh5KSI+PC9yZWN0Pgo8L3N2Zz4=');
+      z-index: 3;
+      animation: galaxy-rotate 240s linear infinite;
+    }
+
+    .cosmic-dust {
+      position: absolute;
+      width: 300%;
+      height: 300%;
+      top: -100%;
+      left: -100%;
+      background-image: 
+        radial-gradient(circle at 30% 40%, rgba(128, 0, 255, 0.1) 0%, rgba(128, 0, 255, 0) 20%),
+        radial-gradient(circle at 70% 60%, rgba(0, 255, 255, 0.1) 0%, rgba(0, 255, 255, 0) 20%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.1) 0%, rgba(255, 0, 255, 0) 40%);
+      z-index: 4;
+      animation: cosmic-dust-move 180s linear infinite;
+    }
+
+    @keyframes nebula-move {
+      0% { transform: translate(0, 0); }
+      50% { transform: translate(5%, 5%); }
+      100% { transform: translate(0, 0); }
+    }
+
+    @keyframes galaxy-rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes cosmic-dust-move {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.1); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 5;
+    }
+
+    .calculator {
+      position: relative;
+      z-index: 10;
+      transform-style: preserve-3d;
+      transition: transform 0.3s ease;
+    }
+
+    .calculator-body {
+      background: rgba(20, 10, 40, 0.4);
+      border: 1px solid rgba(128, 128, 255, 0.3);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 0 40px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 25px;
+      width: 350px;
+      transform-style: preserve-3d;
+      animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateZ(0);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.3), inset 0 0 10px rgba(0, 255, 255, 0.1);
+      }
+      50% {
+        transform: translateY(-10px) translateZ(20px);
+        box-shadow: 0 0 60px rgba(0, 255, 255, 0.6), inset 0 0 20px rgba(0, 255, 255, 0.3);
+      }
+    }
+
+    .calculator-display {
+      position: relative;
+      margin-bottom: 24px;
+      overflow: hidden;
+      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 16px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+
+    .calculator-display::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(to bottom, transparent, rgba(0, 255, 231, 0.1), transparent);
+      transform: rotate(45deg);
+      animation: scanline 4s linear infinite;
+    }
+
+    @keyframes scanline {
+      0% {
+        transform: translateY(-100%) rotate(45deg);
+      }
+      100% {
+        transform: translateY(100%) rotate(45deg);
+      }
+    }
+
+    .display-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 242, 0.05);
+      pointer-events: none;
+    }
+
+    .display-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: inset 0 0 15px #00fff2;
+      pointer-events: none;
+      border-radius: 15px;
+    }
+
+    .display-top-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: linear-gradient(to bottom, rgba(0, 255, 242, 0.2), transparent);
+      pointer-events: none;
+    }
+
+    .display-bottom-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: #00fff2;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .display-expression {
+      color: #888;
+      text-align: right;
+      font-size: 18px;
+      margin-bottom: 4px;
+      height: 28px;
+      overflow: hidden;
+    }
+
+    .display-result {
+      color: #00fff2;
+      text-align: right;
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      overflow: hidden;
+      text-shadow: 0 0 8px rgba(0, 255, 242, 0.5);
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    .button {
+      padding: 20px 0;
+      font-size: 20px;
+      border: none;
+      border-radius: 15px;
+      background: linear-gradient(145deg, #1a1a1a, #111);
+      color: #00ffe7;
+      text-shadow: 0 0 8px #00ffe7;
+      box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3), inset 0 0 5px rgba(0, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      transform-style: preserve-3d;
+      overflow: hidden;
+    }
+
+    .button:hover {
+      transform: translateZ(10px);
+      box-shadow: 0 0 20px rgba(0, 255, 231, 0.6);
+    }
+
+    .button:active {
+      transform: translateZ(0) scale(0.95);
+      box-shadow: 0 0 10px rgba(0, 255, 231, 0.4);
+    }
+
+    .button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), transparent);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .button-inner {
+      position: relative;
+      z-index: 2;
+    }
+
+    .button-hover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 255, 231, 0.1);
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+    }
+
+    .button:hover .button-hover-overlay {
+      opacity: 1;
+    }
+
+    .button-border {
+      position: absolute;
+      inset: -1px;
+      background: linear-gradient(to bottom right, rgba(0, 255, 231, 0.5), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .button:hover .button-border {
+      opacity: 0.3;
+    }
+
+    .button-glow {
+      position: absolute;
+      inset: 0;
+      box-shadow: inset 0 0 5px rgba(0, 255, 231, 0.3);
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .button-clear {
+      background: linear-gradient(to bottom right, #ff5555, #aa2222);
+    }
+
+    .button-backspace {
+      background: linear-gradient(to bottom right, #ff9955, #aa6622);
+    }
+
+    .button-percent {
+      background: linear-gradient(to bottom right, #aa55ff, #7722aa);
+    }
+
+    .button-operator {
+      background: linear-gradient(to bottom right, #5555ff, #2222aa);
+    }
+
+    .button-equals {
+      background: linear-gradient(to bottom right, #55ff99, #22aa66);
+    }
+
+
+    .floating-orb {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.7;
+      filter: blur(8px);
+    }
+
+    .orb-1 {
+      right: -32px;
+      top: -32px;
+      width: 64px;
+      height: 64px;
+      background: linear-gradient(to bottom right, #40e0d0, #0088cc);
+      animation: float-orb-1 8s ease-in-out infinite;
+    }
+
+    .orb-2 {
+      left: -24px;
+      bottom: -24px;
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(to bottom right, #a855f7, #6b21a8);
+      animation: float-orb-2 7s ease-in-out infinite;
+    }
+
+    .orb-3 {
+      right: 25%;
+      bottom: -16px;
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(to bottom right, #3b82f6, #1e40af);
+      animation: float-orb-3 6s ease-in-out infinite;
+    }
+
+    @keyframes float-orb-1 {
+      0%, 100% { transform: translateZ(40px) translateY(0); }
+      50% { transform: translateZ(40px) translateY(-20px); }
+    }
+
+    @keyframes float-orb-2 {
+      0%, 100% { transform: translateZ(30px) translateY(0); }
+      50% { transform: translateZ(30px) translateY(-15px); }
+    }
+
+    @keyframes float-orb-3 {
+      0%, 100% { transform: translateZ(20px) translateY(0); }
+      50% { transform: translateZ(20px) translateY(-10px); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="galaxy-background">
+    <div class="stars"></div>
+    <div class="nebula"></div>
+    <div class="galaxy"></div>
+    <div class="cosmic-dust"></div>
+  </div>
+  
+  <canvas id="starsCanvas"></canvas>
+
+  <div id="calculator" class="calculator">
+    <div class="calculator-body">
+      <div class="calculator-display">
+        <div class="display-overlay"></div>
+        <div class="display-glow"></div>
+        <div class="display-top-glow"></div>
+        <div class="display-bottom-line"></div>
+        <div id="displayExpression" class="display-expression"></div>
+        <div id="displayResult" class="display-result">0</div>
+      </div>
+
+      <div class="buttons">
+        <button class="button button-clear" data-value="clear">
+          <span class="button-inner">C</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-backspace" data-value="backspace">
+          <span class="button-inner">⌫</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-percent" data-value="%">
+          <span class="button-inner">%</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-operator" data-value="/">
+          <span class="button-inner">/</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        
+        <button class="button" data-value="7">
+          <span class="button-inner">7</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="8">
+          <span class="button-inner">8</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="9">
+          <span class="button-inner">9</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-operator" data-value="*">
+          <span class="button-inner">*</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        
+        <button class="button" data-value="4">
+          <span class="button-inner">4</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="5">
+          <span class="button-inner">5</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="6">
+          <span class="button-inner">6</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-operator" data-value="-">
+          <span class="button-inner">-</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        
+        <button class="button" data-value="1">
+          <span class="button-inner">1</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="2">
+          <span class="button-inner">2</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="3">
+          <span class="button-inner">3</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-operator" data-value="+">
+          <span class="button-inner">+</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        
+        <button class="button" data-value="00">
+          <span class="button-inner">00</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value="0">
+          <span class="button-inner">0</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button" data-value=".">
+          <span class="button-inner">.</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+        <button class="button button-equals" data-value="=">
+          <span class="button-inner">=</span>
+          <div class="button-hover-overlay"></div>
+          <div class="button-border"></div>
+          <div class="button-glow"></div>
+        </button>
+      </div>
+    </div>
+
+
+    <div class="floating-orb orb-1"></div>
+    <div class="floating-orb orb-2"></div>
+    <div class="floating-orb orb-3"></div>
+  </div>
+
+
+  <audio id="buttonSound" preload="auto">
+    <source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADwAD///////////////////////////////////////////8AAAA8TEFNRTMuMTAwAc0AAAAAAAAAABSAJAJAQgAAgAAAA8DcWTzpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZB8P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mp3">
+  </audio>
+  <audio id="calculationSound" preload="auto">
+    <source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADwAD///////////////////////////////////////////8AAAA8TEFNRTMuMTAwAc0AAAAAAAAAABSAJAJAQgAAgAAAA8DcWTzpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZB8P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mp3">
+  </audio>
+  <audio id="clearSound" preload="auto">
+    <source src="data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADwAD///////////////////////////////////////////8AAAA8TEFNRTMuMTAwAc0AAAAAAAAAABSAJAJAQgAAgAAAA8DcWTzpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//sQZAAP8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAETEFNRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV//sQZB8P8AAAaQAAAAgAAA0gAAABAAABpAAAACAAADSAAAAEVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV" type="audio/mp3">
+  </audio>
+
+  <script>
+
+    const displayExpression = document.getElementById('displayExpression');
+    const displayResult = document.getElementById('displayResult');
+    const buttons = document.querySelectorAll('.button');
+    const calculator = document.getElementById('calculator');
+    const buttonSound = document.getElementById('buttonSound');
+    const calculationSound = document.getElementById('calculationSound');
+    const clearSound = document.getElementById('clearSound');
+
+    let expression = '';
+    let result = '0';
+    let isCalculated = false;
+
+
+    buttons.forEach(button => {
+      button.addEventListener('click', () => {
+        const value = button.getAttribute('data-value');
+        handleInput(value);
+      });
+    });
+
+
+    document.addEventListener('keydown', (e) => {
+      const key = e.key;
+      if ((key >= '0' && key <= '9') || key === '+' || key === '-' || key === '*' || key === '/' || key === '.') {
+        handleInput(key);
+      } else if (key === 'Enter' || key === '=') {
+        handleInput('=');
+      } else if (key === 'Escape') {
+        handleInput('clear');
+      } else if (key === 'Backspace') {
+        handleInput('backspace');
+      }
+    });
+
+    // Input handler
+    function handleInput(value) {
+      switch (value) {
+        case 'clear':
+          playSound(clearSound);
+          expression = '';
+          result = '0';
+          isCalculated = false;
+          break;
+        case 'backspace':
+          playSound(buttonSound);
+          if (isCalculated) {
+            expression = '';
+            result = '0';
+            isCalculated = false;
+          } else {
+            expression = expression.slice(0, -1);
+          }
+          break;
+        case '=':
+          playSound(calculationSound);
+          try {
+            result = eval(expression).toString();
+            isCalculated = true;
+          } catch {
+            result = 'Error';
+            isCalculated = true;
+          }
+          break;
+        default:
+          playSound(buttonSound);
+          if (isCalculated) {
+            expression = value;
+            result = value;
+            isCalculated = false;
+          } else {
+            expression += value;
+            result = expression;
+          }
+          break;
+      }
+
+      updateDisplay();
+    }
+
+
+    function updateDisplay() {
+      displayExpression.textContent = isCalculated ? expression : '';
+      displayResult.textContent = result || '0';
+    }
+
+
+    function playSound(sound) {
+      sound.currentTime = 0;
+      sound.play().catch(e => console.error("Audio play failed:", e));
+    }
+
+
+    let rotateX = 0;
+    let rotateY = 0;
+    let targetRotateX = 0;
+    let targetRotateY = 0;
+
+    document.addEventListener('mousemove', (e) => {
+      const centerX = window.innerWidth / 2;
+      const centerY = window.innerHeight / 2;
+      
+
+      const distanceX = (e.clientX - centerX) / (window.innerWidth / 2);
+      const distanceY = (e.clientY - centerY) / (window.innerHeight / 2);
+      
+
+      targetRotateY = distanceX * 10;
+      targetRotateX = -distanceY * 10;
+    });
+
+
+    function updateRotation() {
+
+      rotateX += (targetRotateX - rotateX) * 0.1;
+      rotateY += (targetRotateY - rotateY) * 0.1;
+      
+      calculator.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+      
+      requestAnimationFrame(updateRotation);
+    }
+    
+    updateRotation();
+
+
+    const canvas = document.getElementById('starsCanvas');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      createStars();
+    }
+    
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    
+
+    function createStars() {
+      stars = [];
+      const starCount = Math.min(Math.floor(window.innerWidth * 0.1), 300);
+      
+      for (let i = 0; i < starCount; i++) {
+        const size = Math.random() * 2 + 0.5;
+        stars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          size: size,
+          opacity: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.05 + 0.01,
+          twinkleSpeed: Math.random() * 0.01 + 0.003,
+          twinkleDirection: Math.random() > 0.5 ? 1 : -1,
+          color: getStarColor()
+        });
+      }
+    }
+    
+    function getStarColor() {
+      const colors = [
+        'rgba(255, 255, 255, 1)', 
+        'rgba(200, 220, 255, 1)', 
+        'rgba(255, 220, 180, 1)', 
+        'rgba(255, 180, 180, 1)', 
+        'rgba(180, 255, 255, 1)'  
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+    
+
+    function animateStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      stars.forEach(star => {
+    
+        star.x -= star.speed;
+        if (star.x < 0) star.x = canvas.width;
+        
+       
+        star.opacity += star.twinkleSpeed * star.twinkleDirection;
+        if (star.opacity > 1 || star.opacity < 0.2) {
+          star.twinkleDirection *= -1;
+        }
+        
+
+        ctx.beginPath();
+        ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+        ctx.fillStyle = star.color.replace('1)', `${star.opacity})`);
+        ctx.fill();
+        
+
+        ctx.shadowBlur = star.size * 3;
+        ctx.shadowColor = star.color;
+        
+  
+        ctx.shadowBlur = 0;
+      });
+      
+  
+      if (Math.random() < 0.01) {
+        drawShootingStar();
+      }
+      
+      requestAnimationFrame(animateStars);
+    }
+    
+    function drawShootingStar() {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * (canvas.height / 3); 
+      const length = Math.random() * 100 + 50;
+      const angle = Math.PI / 4 + (Math.random() * Math.PI / 4); 
+      
+      const tailX = x + Math.cos(angle) * length;
+      const tailY = y + Math.sin(angle) * length;
+      
+      const gradient = ctx.createLinearGradient(x, y, tailX, tailY);
+      gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+      gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+      
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(tailX, tailY);
+      ctx.strokeStyle = gradient;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      
+      // Add glow
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+    }
+    
+    animateStars();
+  </script>
+</body>
+</html>
